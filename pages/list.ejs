@@ -1,0 +1,81 @@
+<% for (var project in data) { %>
+<h3 style="margin: 0; padding: 20px 10px; background: #dbdbdb">
+  <%= project %>
+  <!-- <button><a href="/store">浏览所有静态资源</a></button> -->
+</h3>
+<% for (var branchInfo of data[project]) {%> <% if (branchInfo.DBstatus === 'enabled' && !!branchInfo.commit_hash) {%>
+<div style="padding: 10px 0 10px 20px; border-bottom: 1px solid #000; display: flex; align-items: center">
+  <span><%= branchInfo.projectBranch %></span>
+  <div style="margin-left: 20px">
+    <div style="margin: 10px 0">
+      <button onclick="change('<%= project %>','<%= branchInfo.projectBranch %>', '<%= branchInfo.remote %>')">
+        生成普通报告
+      </button>
+      <button>
+        <a href="/store/<%= project %>/<%= branchInfo.projectBranch %>/coverage_assets/index.html">查看普通报告</a>
+      </button>
+    </div>
+    <% if(branchInfo.projectBranch !== 'master' && branchInfo.projectBranch !== 'main') { %>
+    <div style="margin: 10px 0">
+      <button
+        onclick="change('<%= project %>','<%= branchInfo.projectBranch %>', '<%= branchInfo.remote %>', true, '<%= branchInfo.increment_coverage_dir %>', '<%= branchInfo.relative_path_prefix %>')"
+      >
+        生成<b>增量</b>报告
+      </button>
+      <button>
+        <a href="/store/<%= project %>/<%= branchInfo.projectBranch %>/increment_coverage_assets/index.html"
+          >查看<b>增量</b>报告</a
+        >
+      </button>
+    </div>
+
+    <% } %>
+  </div>
+  <ul style="color: #aaa">
+    <li>仓库状态：<%= branchInfo.DBstatus %></li>
+    <li>当前提交id：<%= branchInfo.commit_hash %></li>
+    <li>增量对比目录：<%= branchInfo.increment_coverage_dir %></li>
+    <li>信息更新时间：<%= branchInfo.operation_date %></li>
+  </ul>
+</div>
+
+<% } %> <% } %> <% } %>
+<script>
+  function change(
+    project_name,
+    branch,
+    remote = '',
+    isIncrement = false,
+    increment_coverage_dir = '',
+    relative_path_prefix = ''
+  ) {
+    fetch('/report', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+      body: JSON.stringify({
+        branch,
+        project_name,
+        isIncrement,
+        increment_coverage_dir,
+        relative_path_prefix,
+        remote,
+      }),
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        const { success, message } = json;
+        if (success) {
+          alert(message);
+        } else {
+          alert(message);
+          console.error(message);
+        }
+      })
+      .catch((err) => {
+        alert('Request Failed');
+        console.log('Request Failed', err);
+      });
+  }
+</script>

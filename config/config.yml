@@ -1,0 +1,21 @@
+# server
+## port
+port: 8050
+
+# redis DB
+## host
+DBhost: 10.110.7.6
+## port
+DBport: 8998
+## password
+#password: password
+## db index
+DBindex: 1
+
+# other
+## git 拉取时使用的账号密码
+gitAccountPassword: wangjian0818:Wj524235.
+## 源码存放路径
+sourceLocation: ./store
+## 主分支的名称
+mainBranchName: master
